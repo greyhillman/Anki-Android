@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -17,8 +18,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.IntentCompat;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBarActivity;
 
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -34,13 +35,20 @@ import com.ichi2.libanki.Collection;
 
 import timber.log.Timber;
 
-public class AnkiActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Collection>,
+public class AnkiActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Collection>,
         SimpleMessageDialog.SimpleMessageDialogListener {
 
     public final int SIMPLE_NOTIFICATION_ID = 0;
 
     private DialogHandler mHandler = new DialogHandler(this);
 
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // The hardware buttons should control the music volume
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     protected void onResume() {
@@ -265,20 +273,24 @@ public class AnkiActivity extends ActionBarActivity implements LoaderManager.Loa
 
     public void showProgressBar() {
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
-        progressBar.setVisibility(View.VISIBLE);
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
     }
 
 
     public void hideProgressBar() {
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
-        progressBar.setVisibility(View.GONE);
+        if (progressBar != null) {
+          progressBar.setVisibility(View.GONE);
+        }
     }
 
 
     /**
      * Global method to show dialog fragment including adding it to back stack Note: DO NOT call this from an async
      * task! If you need to show a dialog from an async task, use showAsyncDialogFragment()
-     * 
+     *
      * @param newFragment  the DialogFragment you want to show
      */
     public void showDialogFragment(DialogFragment newFragment) {
@@ -301,7 +313,7 @@ public class AnkiActivity extends ActionBarActivity implements LoaderManager.Loa
      * Global method to show a dialog fragment including adding it to back stack and handling the case where the dialog
      * is shown from an async task, by showing the message in the notification bar if the activity was stopped before the
      * AsyncTask completed
-     * 
+     *
      * @param newFragment  the AsyncDialogFragment you want to show
      */
     public void showAsyncDialogFragment(AsyncDialogFragment newFragment) {
@@ -322,7 +334,7 @@ public class AnkiActivity extends ActionBarActivity implements LoaderManager.Loa
      * Show a simple message dialog, dismissing the message without taking any further action when OK button is pressed.
      * If a DialogFragment cannot be shown due to the Activity being stopped then the message is shown in the
      * notification bar instead.
-     * 
+     *
      * @param message
      */
     protected void showSimpleMessageDialog(String message) {
@@ -338,7 +350,7 @@ public class AnkiActivity extends ActionBarActivity implements LoaderManager.Loa
      * Show a simple message dialog, dismissing the message without taking any further action when OK button is pressed.
      * If a DialogFragment cannot be shown due to the Activity being stopped then the message is shown in the
      * notification bar instead.
-     * 
+     *
      * @param message
      * @param reload flag which forces app to be restarted when true
      */
